@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { API_URL } from "../config/api";
 
 function UpdatePassword() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function UpdatePassword() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/update-password",
+        `${API_URL}/api/auth/update-password`,
         {
           method: "PUT",
 
@@ -33,20 +34,25 @@ function UpdatePassword() {
         }
       );
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
       if (response.ok) {
         alert("Password updated successfully!");
 
         navigate("/login");
       } else {
-        alert(data.message);
+        alert(data.message || "Password update failed. Please check your email or database.");
       }
 
     } catch (error) {
-      console.error("Password update error:", error);
+      console.error("Password update network error:", error);
 
-      alert("Unable to connect to server");
+      alert("Unable to connect to backend server. Please verify backend is running.");
     }
   };
 

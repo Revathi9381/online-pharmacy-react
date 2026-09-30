@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function AIReminder() {
   // =====================================================
   // USER
   // =====================================================
 
-  const savedUser = JSON.parse(localStorage.getItem("user"));
-  const userId = savedUser?.id;
+  const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+  const userId = savedUser?.id || savedUser?._id;
 
   // =====================================================
   // STATES
@@ -349,7 +350,7 @@ function AIReminder() {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/reminders?userId=${userId}`
+        `${API_URL}/api/reminders?userId=${userId}`
       );
 
       if (!res.ok) {
@@ -585,7 +586,7 @@ function AIReminder() {
       // UPDATE
       if (editingId) {
         res = await fetch(
-          `http://localhost:5000/api/reminders/${editingId}`,
+          `${API_URL}/api/reminders/${editingId}`,
           {
             method: "PUT",
             headers: {
@@ -599,7 +600,7 @@ function AIReminder() {
       // CREATE
       else {
         res = await fetch(
-          "http://localhost:5000/api/reminders",
+          `${API_URL}/api/reminders`,
           {
             method: "POST",
             headers: {
@@ -762,7 +763,7 @@ function AIReminder() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/reminders/${id}?userId=${userId}`,
+        `${API_URL}/api/reminders/${id}?userId=${userId}`,
         {
           method: "DELETE",
         }

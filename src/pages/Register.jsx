@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Register() {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ function Register() {
       // ================= REGISTER USER =================
 
       const response = await fetch(
-        "http://localhost:5000/api/auth/register",
+        `${API_URL}/api/auth/register`,
         {
           method: "POST",
 
@@ -74,19 +75,24 @@ function Register() {
         }
       );
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
-      // ================= SUCCESS =================
+      // ================= SUCCESS / ERROR =================
 
       if (response.ok) {
         alert("Registration successful!");
         navigate("/login");
       } else {
-        alert(data.message || "Registration failed");
+        alert(data.message || "Registration failed. Please check the server/database.");
       }
     } catch (error) {
-      console.error("Registration error:", error);
-      alert("Unable to connect to server");
+      console.error("Registration network error:", error);
+      alert("Unable to connect to backend server. Please verify backend is running.");
     }
   };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Caretaker() {
   const [caretakers, setCaretakers] = useState([]);
@@ -12,7 +13,7 @@ function Caretaker() {
 
   // Get logged-in user
   const savedUser = JSON.parse(localStorage.getItem("user") || "null");
-  const userId = savedUser?.id;
+  const userId = savedUser?.id || savedUser?._id;
 
   // Form states
   const [name, setName] = useState("");
@@ -49,7 +50,7 @@ function Caretaker() {
       setLoading(true);
 
       const res = await fetch(
-        `http://localhost:5000/api/caretakers?userId=${userId}`
+        `${API_URL}/api/caretakers?userId=${userId}`
       );
 
       if (!res.ok) {
@@ -127,10 +128,10 @@ function Caretaker() {
 
       const [scheduleRes, reminderRes] = await Promise.all([
         fetch(
-          `http://localhost:5000/api/schedules?userId=${userId}`
+          `${API_URL}/api/schedules?userId=${userId}`
         ),
         fetch(
-          `http://localhost:5000/api/reminders?userId=${userId}`
+          `${API_URL}/api/reminders?userId=${userId}`
         ),
       ]);
 
@@ -302,7 +303,7 @@ function Caretaker() {
       if (editingId) {
         // UPDATE
         res = await fetch(
-          `http://localhost:5000/api/caretakers/${editingId}`,
+          `${API_URL}/api/caretakers/${editingId}`,
           {
             method: "PUT",
             headers: {
@@ -314,7 +315,7 @@ function Caretaker() {
       } else {
         // CREATE
         res = await fetch(
-          "http://localhost:5000/api/caretakers",
+          `${API_URL}/api/caretakers`,
           {
             method: "POST",
             headers: {
@@ -417,7 +418,7 @@ function Caretaker() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/caretakers/${id}?userId=${userId}`,
+        `${API_URL}/api/caretakers/${id}?userId=${userId}`,
         {
           method: "DELETE",
         }

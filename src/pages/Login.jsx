@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/login",
+        `${API_URL}/api/auth/login`,
         {
           method: "POST",
 
@@ -31,7 +32,12 @@ function Login() {
         }
       );
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
       if (response.ok) {
         localStorage.setItem(
@@ -43,12 +49,12 @@ function Login() {
 
         navigate("/dashboard");
       } else {
-        alert(data.message);
+        alert(data.message || "Login failed. Please check your credentials or database.");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login network error:", error);
 
-      alert("Unable to connect to server");
+      alert("Unable to connect to backend server. Please verify backend is running.");
     }
   };
 

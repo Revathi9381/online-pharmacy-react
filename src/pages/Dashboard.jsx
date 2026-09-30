@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ function Dashboard() {
 
   // Logged-in user information
   const [userName, setUserName] = useState("User");
+  const [userId, setUserId] = useState(null);
 
   // Live MongoDB states
   const [loading, setLoading] = useState(true);
@@ -31,6 +33,9 @@ function Dashboard() {
       if (savedUser?.fullName) {
         setUserName(savedUser.fullName);
       }
+      if (savedUser?.id || savedUser?._id) {
+        setUserId(savedUser.id || savedUser._id);
+      }
     } catch (error) {
       console.error("Error reading user information:", error);
     }
@@ -44,6 +49,11 @@ function Dashboard() {
 
       setRefreshing(true);
 
+      const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+      const currentUserId = savedUser?.id || savedUser?._id || userId;
+
+      const userParam = currentUserId ? `?userId=${currentUserId}` : "";
+
       const [
         medsRes,
         ordersRes,
@@ -51,32 +61,37 @@ function Dashboard() {
         remRes,
         careRes
       ] = await Promise.all([
-        fetch("http://localhost:5000/api/medicines"),
-        fetch("http://localhost:5000/api/orders"),
-        fetch("http://localhost:5000/api/schedules"),
-        fetch("http://localhost:5000/api/reminders"),
-        fetch("http://localhost:5000/api/caretakers")
+        fetch(`${API_URL}/api/medicines`),
+        fetch(`${API_URL}/api/orders${userParam}`),
+        fetch(`${API_URL}/api/schedules${userParam}`),
+        fetch(`${API_URL}/api/reminders${userParam}`),
+        fetch(`${API_URL}/api/caretakers${userParam}`)
       ]);
 
 
       if (medsRes.ok) {
-        setMedicines(await medsRes.json());
+        const data = await medsRes.json();
+        setMedicines(Array.isArray(data) ? data : []);
       }
 
       if (ordersRes.ok) {
-        setOrders(await ordersRes.json());
+        const data = await ordersRes.json();
+        setOrders(Array.isArray(data) ? data : []);
       }
 
       if (schedRes.ok) {
-        setSchedules(await schedRes.json());
+        const data = await schedRes.json();
+        setSchedules(Array.isArray(data) ? data : []);
       }
 
       if (remRes.ok) {
-        setReminders(await remRes.json());
+        const data = await remRes.json();
+        setReminders(Array.isArray(data) ? data : []);
       }
 
       if (careRes.ok) {
-        setCaretakers(await careRes.json());
+        const data = await careRes.json();
+        setCaretakers(Array.isArray(data) ? data : []);
       }
 
 
@@ -101,7 +116,7 @@ function Dashboard() {
 
     }
 
-  }, []);
+  }, [userId]);
 
 
   // ================= INITIAL LOAD =================
@@ -109,21 +124,24 @@ function Dashboard() {
   useEffect(() => {
 
     let isMounted = true;
+    const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+    const currentUserId = savedUser?.id || savedUser?._id || userId;
+    const userParam = currentUserId ? `?userId=${currentUserId}` : "";
 
     Promise.all([
-      fetch("http://localhost:5000/api/medicines")
+      fetch(`${API_URL}/api/medicines`)
         .then((r) => (r.ok ? r.json() : [])),
 
-      fetch("http://localhost:5000/api/orders")
+      fetch(`${API_URL}/api/orders${userParam}`)
         .then((r) => (r.ok ? r.json() : [])),
 
-      fetch("http://localhost:5000/api/schedules")
+      fetch(`${API_URL}/api/schedules${userParam}`)
         .then((r) => (r.ok ? r.json() : [])),
 
-      fetch("http://localhost:5000/api/reminders")
+      fetch(`${API_URL}/api/reminders${userParam}`)
         .then((r) => (r.ok ? r.json() : [])),
 
-      fetch("http://localhost:5000/api/caretakers")
+      fetch(`${API_URL}/api/caretakers${userParam}`)
         .then((r) => (r.ok ? r.json() : []))
     ])
 

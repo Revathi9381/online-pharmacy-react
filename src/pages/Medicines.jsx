@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Medicines() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -8,10 +9,10 @@ function Medicines() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/medicines")
+    fetch(`${API_URL}/api/medicines`)
       .then((response) => response.json())
       .then((data) => {
-        setMedicines(data);
+        setMedicines(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((error) => {
@@ -179,11 +180,11 @@ function Medicines() {
 
             {filteredMedicines.length > 0 ? (
 
-              filteredMedicines.map((medicine) => (
+              filteredMedicines.map((medicine, index) => (
 
                 <div
                   className="col-md-6 col-lg-4"
-                  key={medicine.id}
+                  key={medicine._id || medicine.id || index}
                 >
 
                   <div className="card h-100 shadow-sm medicine-card">

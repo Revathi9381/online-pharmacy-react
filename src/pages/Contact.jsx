@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Contact() {
   const [name, setName] = useState("");
@@ -23,10 +24,10 @@ function Contact() {
   const fetchMessages = async () => {
     try {
       setLoadingMessages(true);
-      const res = await fetch("http://localhost:5000/api/contact");
+      const res = await fetch(`${API_URL}/api/contact`);
       if (res.ok) {
         const data = await res.json();
-        setSubmittedMessages(data);
+        setSubmittedMessages(Array.isArray(data) ? data : []);
       }
     } catch (err) {
       console.error("Error loading contact messages:", err);
@@ -37,11 +38,11 @@ function Contact() {
 
   useEffect(() => {
     let isMounted = true;
-    fetch("http://localhost:5000/api/contact")
+    fetch(`${API_URL}/api/contact`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         if (isMounted) {
-          setSubmittedMessages(data);
+          setSubmittedMessages(Array.isArray(data) ? data : []);
           setLoadingMessages(false);
         }
       })
@@ -102,7 +103,7 @@ function Contact() {
       setSubmitting(true);
       setFeedback({ text: "", type: "" });
 
-      const res = await fetch("http://localhost:5000/api/contact", {
+      const res = await fetch(`${API_URL}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

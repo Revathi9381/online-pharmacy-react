@@ -21,9 +21,7 @@ function App() {
       <Routes>
 
         <Route path="/" element={<Home />} />
-<Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
 
         <Route
@@ -32,26 +30,28 @@ function App() {
         />
 
         <Route path="/dashboard" element={<Dashboard />} />
-
         <Route path="/profile" element={<Profile />} />
-
         <Route path="/medicines" element={<Medicines />} />
-
         <Route path="/orders" element={<Orders />} />
-
         <Route path="/schedule" element={<Schedule />} />
-
         <Route path="/history" element={<History />} />
-
         <Route path="/contact" element={<Contact />} />
 
         <Route
           path="/reminder"
           element={<AIRemainder />}
         />
+        <Route
+          path="/reminders"
+          element={<AIRemainder />}
+        />
 
         <Route
           path="/caretaker"
+          element={<Caretaker />}
+        />
+        <Route
+          path="/caretakers"
           element={<Caretaker />}
         />
 

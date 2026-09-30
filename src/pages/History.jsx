@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function History() {
   const [history, setHistory] = useState([]);
@@ -16,10 +17,10 @@ function History() {
   // =====================================================
 
   const savedUser = JSON.parse(
-    localStorage.getItem("user")
+    localStorage.getItem("user") || "null"
   );
 
-  const userId = savedUser?.id;
+  const userId = savedUser?.id || savedUser?._id;
 
   // =====================================================
   // FETCH HISTORY
@@ -41,7 +42,7 @@ function History() {
       }
 
       let url =
-        `http://localhost:5000/api/history?userId=${userId}`;
+        `${API_URL}/api/history?userId=${userId}`;
 
       if (
         filterMode === "Completed" ||
@@ -138,7 +139,7 @@ function History() {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/history/${orderId}/status`,
+        `${API_URL}/api/history/${orderId}/status`,
         {
           method: "PUT",
 
@@ -213,7 +214,7 @@ function History() {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/history/${orderId}?userId=${userId}`,
+        `${API_URL}/api/history/${orderId}?userId=${userId}`,
         {
           method: "DELETE",
         }
@@ -283,7 +284,7 @@ function History() {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/history?userId=${userId}`,
+        `${API_URL}/api/history?userId=${userId}`,
         {
           method: "DELETE",
         }

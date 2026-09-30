@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Orders() {
+  const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+  const userId = savedUser?.id || savedUser?._id;
+
   // Current cart / pending order items (from localStorage)
   const [pendingOrders, setPendingOrders] = useState(() => {
     try {
@@ -20,10 +24,13 @@ function Orders() {
   const fetchPlacedOrders = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/orders");
+      const url = userId
+        ? `${API_URL}/api/orders?userId=${userId}`
+        : `${API_URL}/api/orders`;
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
-        setPlacedOrders(data);
+        setPlacedOrders(Array.isArray(data) ? data : []);
       }
     } catch (error) {
       console.error("Error fetching placed orders:", error);
@@ -34,11 +41,14 @@ function Orders() {
 
   useEffect(() => {
     let isMounted = true;
-    fetch("http://localhost:5000/api/orders")
+    const url = userId
+      ? `${API_URL}/api/orders?userId=${userId}`
+      : `${API_URL}/api/orders`;
+    fetch(url)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         if (isMounted) {
-          setPlacedOrders(data);
+          setPlacedOrders(Array.isArray(data) ? data : []);
           setLoading(false);
         }
       })
@@ -50,7 +60,7 @@ function Orders() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [userId]);
 
   // Update quantity of an item in cart
   const updateQuantity = (index, delta) => {
@@ -82,6 +92,7 @@ function Orders() {
       setPlacingOrder(true);
 
       const itemsToSubmit = pendingOrders.map((item) => ({
+        userId: userId,
         medicineId: item._id || item.id,
         medicineName: item.name,
         price: Number(item.price) || 0,
@@ -89,7 +100,11 @@ function Orders() {
         totalPrice: (Number(item.price) || 0) * (item.quantity || 1)
       }));
 
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const url = userId
+        ? `${API_URL}/api/orders?userId=${userId}`
+        : `${API_URL}/api/orders`;
+
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -122,7 +137,11 @@ function Orders() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+      const url = userId
+        ? `${API_URL}/api/orders/${orderId}?userId=${userId}`
+        : `${API_URL}/api/orders/${orderId}`;
+
+      const response = await fetch(url, {
         method: "DELETE"
       });
 

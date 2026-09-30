@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 function Schedule() {
   // ================= GET LOGGED-IN USER =================
-  const savedUser = JSON.parse(localStorage.getItem("user"));
-  const userId = savedUser?.id;
+  const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+  const userId = savedUser?.id || savedUser?._id;
 
   const [medicine, setMedicine] = useState("");
   const [time, setTime] = useState("");
@@ -46,7 +47,7 @@ function Schedule() {
     const fetchMedicines = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/medicines"
+          `${API_URL}/api/medicines`
         );
 
         if (res.ok) {
@@ -74,19 +75,18 @@ function Schedule() {
       setLoading(true);
 
       if (!userId) {
-        console.error("No logged-in user found");
         setSchedules([]);
         return;
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/schedules?userId=${userId}`
+        `${API_URL}/api/schedules?userId=${userId}`
       );
 
       const data = await res.json();
 
       if (res.ok) {
-        setSchedules(data);
+        setSchedules(Array.isArray(data) ? data : []);
       } else {
         console.error(
           data.message || "Failed to fetch schedules"
@@ -146,7 +146,7 @@ function Schedule() {
       setSubmitting(true);
 
       const res = await fetch(
-        "http://localhost:5000/api/schedules",
+        `${API_URL}/api/schedules`,
         {
           method: "POST",
 
@@ -213,7 +213,7 @@ function Schedule() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/schedules/${id}?userId=${userId}`,
+        `${API_URL}/api/schedules/${id}?userId=${userId}`,
         {
           method: "DELETE"
         }
